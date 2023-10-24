@@ -1,0 +1,40 @@
+﻿@page "/login"
+
+@inject IClientService service
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager NavMgr
+
+<EditForm Model="LoginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="card">
+        <div class="card-header">Login</div>
+        <div class="card-body">
+            <div class="form-group">
+                <label class="form-label"> Email Address</label>
+                <InputText class="form-control" @bind-Value="LoginModel.Email"></InputText>
+            </div>
+            <div class="form-group mt-2">
+                <label class="form-label"> Password</label>
+                <InputText class="form-control" @bind-Value="LoginModel.Password"></InputText>
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary float-end">Login</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private Login LoginModel { get; set; } = new();
+    private async Task HandleLogin()
+    {
+        var result = await service.LoginAsync(LoginModel);
+        if (result.Token is not null)
+        {
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(result);
+            NavMgr.NavigateTo("/", replace: true);
+        }
+    }
+}

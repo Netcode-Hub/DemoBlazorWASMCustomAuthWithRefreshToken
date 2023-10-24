@@ -1,0 +1,39 @@
+﻿
+@inherits LayoutComponentBase
+@inject AuthenticationStateProvider authStateProvider
+
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <span>Hello, </span>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="hstack gap-3">
+                        <span>@context.User.Identity!.Name!</span>
+                        <i class="oi oi-power-standby text-danger fw-bold" style="cursor:pointer" @onclick="Logout"></i>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <span>Guest</span>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    public async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession());
+    }
+}
